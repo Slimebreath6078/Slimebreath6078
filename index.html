@@ -1,0 +1,118 @@
+﻿<html>
+
+<head>
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+
+        div {
+            overflow-y: auto;
+        }
+
+        #menu_block {
+            float: left;
+            width: 20%;
+            height: 100%;
+        }
+
+        #body_block {
+            width: 80%;
+            height: 100%;
+        }
+
+        ul#menu_area,
+        ul#menu {
+            margin: 0px;
+            padding: 0px;
+            list-style-type: none;
+        }
+
+        ul#menu_area {
+            background-color: aliceblue;
+            width: 70%;
+        }
+
+        ul#menu,
+        ul#menu_area li,
+        ul#menu li {
+            width: 100%;
+        }
+
+        ul#menu_area>li>span:before,
+        ul#menu>li>span:before {
+            content: "\27A2";
+        }
+
+        ul#menu_area>li#menu>span:before,
+        ul#menu>li#menu>span:before {
+            content: "\23FA";
+        }
+
+        ul#menu_area>li>span,
+        ul#menu>li>span {
+            display: inline-block;
+            width: 100%;
+            background-clip: padding-box;
+        }
+
+        ul#menu_area>li#menu>span,
+        ul#menu>li#menu>span {
+            font-size: large;
+            font-weight: bold;
+        }
+
+        ul#menu_area>li>span,
+        ul#menu>li>span {
+            font-size: medium;
+            font-weight: normal;
+        }
+
+        ul#menu_area>li>span {
+            background-color: #8080ff;
+        }
+
+        ul#menu_area ul#menu>li>span {
+            text-indent: 1em;
+            background-color: #c0ffff;
+        }
+
+        ul#menu_area ul#menu ul#menu>li>span {
+            text-indent: 2em;
+            background-color: #f0fff0;
+        }
+    </style>
+</head>
+<title>火炎の飛竜のホームページ（仮）</title>
+
+<body>
+    <div id="menu_block">
+        <ul id="menu_area">
+            <li id="menu">
+                <span>ゲーム攻略</span>
+                <ul id="menu">
+                    <li id="menu">
+                        <span>カードローグ</span>
+                        <ul id="menu">
+                            <li><span>妖精カードローグ</span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li id="menu">
+                <span>ゲーム開発</span>
+                <ul id="menu">
+                    <li><span>SBband</span></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div id="body_block">
+        <h1>火炎の飛竜のホームページ（仮）</h1>
+        <p>
+            まだいろいろ工事中
+        </p>
+    </div>
+</body>
+
+</html>
