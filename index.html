@@ -6,109 +6,156 @@
             background-color: #ffffff;
         }
 
-        div {
+        div:not(#menu_area) {
             overflow-y: auto;
         }
 
-        #menu_block {
+        div#menu_block {
+            overflow: visible;
             float: left;
             width: 20%;
             height: 100%;
         }
 
-        #body_block {
+        div#body_block {
+            float: right;
             width: 80%;
             height: 100%;
         }
 
-        ul#menu_area,
-        ul#menu {
-            margin: 0px;
-            padding: 0px;
-            list-style-type: none;
-        }
-
-        ul#menu_area {
-            background-color: aliceblue;
+        div#menu_area {
             width: 70%;
         }
 
-        ul#menu,
-        ul#menu_area li,
-        ul#menu li {
-            width: 100%;
+        div#menu_area ul {
+            width: auto;
+            margin: 0px;
+            padding: 0px;
+            list-style-type: none;
+            overflow: visible;
         }
 
-        ul#menu_area>li>span:before,
-        ul#menu>li>span:before {
+        div#menu_area ul>li {
+            position: relative;
+        }
+
+        div#menu_area ul>li#menu>ul {
+            overflow: hidden;
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 100%;
+            max-width: 0em;
+        }
+
+        div#menu_area ul>li#menu:hover>ul {
+            overflow: visible;
+            max-width: 30em;
+            animation: menu_popup 1s ease 0s;
+            transition: max-width 1s ease 0s;
+        }
+
+        @keyframes menu_popup {
+            0% {
+                overflow: hidden;
+            }
+
+            100% {
+                overflow: visible;
+            }
+        }
+
+        div#menu_area ul>li>span:before {
             content: "\27A2";
         }
 
-        ul#menu_area>li#menu>span:before,
-        ul#menu>li#menu>span:before {
+        div#menu_area ul>li#menu>span:before {
             content: "\23FA";
         }
 
-        ul#menu_area>li>span,
-        ul#menu>li>span {
+        div#menu_area ul>li>span {
             display: inline-block;
             width: 100%;
             background-clip: padding-box;
+            padding: 1em 0;
         }
 
-        ul#menu_area>li#menu>span,
-        ul#menu>li#menu>span {
-            font-size: large;
+        div#menu_area ul>li span {
+            font-size: medium;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+
+        div#menu_area ul>li#menu>span {
             font-weight: bold;
         }
 
-        ul#menu_area>li>span,
-        ul#menu>li>span {
-            font-size: medium;
-            font-weight: normal;
-        }
-
-        ul#menu_area>li>span {
+        div#menu_area ul>li>span {
             background-color: #8080ff;
         }
 
-        ul#menu_area ul#menu>li>span {
+        div#menu_area ul>li>ul>li>span {
             text-indent: 1em;
             background-color: #c0ffff;
         }
 
-        ul#menu_area ul#menu ul#menu>li>span {
+        div#menu_area ul>li>ul>li>ul>li>span {
             text-indent: 2em;
             background-color: #f0fff0;
         }
     </style>
 </head>
-<title>火炎の飛竜のホームページ（仮）</title>
+<title>
+    火炎の飛竜のホームページ（仮）
+</title>
 
 <body>
     <div id="menu_block">
-        <ul id="menu_area">
-            <li id="menu">
-                <span>ゲーム攻略</span>
-                <ul id="menu">
-                    <li id="menu">
-                        <span>カードローグ</span>
-                        <ul id="menu">
-                            <li><span>妖精カードローグ</span></li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-            <li id="menu">
-                <span>ゲーム開発</span>
-                <ul id="menu">
-                    <li><span>SBband</span></li>
-                </ul>
-            </li>
-        </ul>
+        <div id="menu_area">
+            <ul>
+                <li id="menu">
+                    <span>
+                        ゲーム攻略
+                    </span>
+                    <ul>
+                        <li id="menu">
+                            <span>
+                                ローグライク
+                            </span>
+                            <ul>
+                                <li>
+                                    <span>
+                                        妖精カードローグ
+                                    </span>
+                                </li>
+                                <li>
+                                    <span>
+                                        不思議の幻想郷3
+                                    </span>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li id="menu">
+                    <span>
+                        ゲーム開発
+                    </span>
+                    <ul>
+                        <li>
+                            <span>
+                                SBband
+                            </span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     </div>
     <div id="body_block">
-        <h1>火炎の飛竜のホームページ（仮）</h1>
+        <h1>
+            火炎の飛竜のホームページ（仮）
+        </h1>
         <p>
             まだいろいろ工事中
         </p>
