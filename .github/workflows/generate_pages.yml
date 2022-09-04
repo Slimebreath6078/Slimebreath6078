@@ -1,0 +1,73 @@
+﻿name: Generate page
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+  BASE_BRANCH_NAME: master
+  HOSTING_BRANCH_NAME: gh-pages
+  LOCAL_BRANCH_NAME: gh-pages-local
+  BASE_DIR: ..\..\..
+
+jobs:
+  Build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.6'  
+      - name: Make_remote_directory
+        run: |
+          mkdir site
+      - name: Setup git
+        run: |
+          git config user.name "Slimebreath6078's Pages Generator"
+          git config user.email "<>"
+          git fetch          
+      - name: Clean up
+        # The reason why we don't use origin/gh-pages and just merge to it is, to prevent git complains gh-pages and the base branch have unrelated histories and conflicts on merge (it should never happen. idk why this happens)
+        continue-on-error: true
+        run: |
+          git branch -d $LOCAL_BRANCH_NAME
+      - name: Checkout
+        run: |
+          git fetch
+          git checkout $BASE_BRANCH_NAME
+          git pull
+          git checkout -b $LOCAL_BRANCH_NAME
+      - name: Make_local_directory
+        run: |
+          mkdir _html
+      - name: Copy_files
+        run: |
+          cp -r _style site/style
+          cp -r _img site/img
+          cp -r _file site/files
+      - name: Generate_html
+        id: build_step
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install markdown
+          python3 .github/workflows/script/generate_html.py ./
+      - name: Merge_html
+        run: |
+          python3 .github/workflows/script/merge_html.py ./ site
+      - name: Commit
+        run: |
+          git add ./ --all
+          git commit -m '適当'
+          git checkout -b $HOSTING_BRANCH_NAME origin/$HOSTING_BRANCH_NAME
+          rm -rf *
+          git checkout $LOCAL_BRANCH_NAME site/
+          mv -f site/* ./
+          rmdir site
+          git add ./ --all
+          git commit -m 'Generated static html files'
+          git push -f origin $HOSTING_BRANCH_NAME
+      - name: Teardown when the workflow failed
+        if: failure() && steps.build_step.outcome == 'failure'
+        run: |
+          git stash -u
