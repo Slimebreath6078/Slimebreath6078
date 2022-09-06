@@ -1,0 +1,101 @@
+﻿body {
+    background-color: #ffffff;
+}
+
+div:not(#menu_area) {
+    overflow-y: auto;
+}
+
+div#menu_block {
+    overflow: visible;
+    float: left;
+    width: 20%;
+    height: 100%;
+}
+
+div#body_block {
+    float: right;
+    width: 80%;
+    height: 100%;
+}
+
+div#menu_area {
+    width: 70%;
+}
+
+div#menu_area ul {
+    width: auto;
+    margin: 0px;
+    padding: 0px;
+    list-style-type: none;
+    overflow: visible;
+}
+
+div#menu_area ul>li {
+    position: relative;
+}
+
+div#menu_area ul>li#menu>ul {
+    overflow: hidden;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 100%;
+    max-width: 0em;
+}
+
+div#menu_area ul>li#menu:hover>ul {
+    overflow: visible;
+    max-width: 30em;
+    animation: menu_popup 1s ease 0s;
+    transition: max-width 1s ease 0s;
+}
+
+@keyframes menu_popup {
+    0% {
+        overflow: hidden;
+    }
+
+    100% {
+        overflow: visible;
+    }
+}
+
+div#menu_area ul>li>span:before {
+    content: "\27A2";
+}
+
+div#menu_area ul>li#menu>span:before {
+    content: "\23FA";
+}
+
+div#menu_area ul>li>span {
+    display: inline-block;
+    width: 100%;
+    background-clip: padding-box;
+    padding: 1em 0;
+}
+
+div#menu_area ul>li span {
+    font-size: medium;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+div#menu_area ul>li#menu>span {
+    font-weight: bold;
+}
+
+div#menu_area ul>li>span {
+    background-color: #8080ff;
+}
+
+div#menu_area ul>li>ul>li>span {
+    text-indent: 1em;
+    background-color: #c0ffff;
+}
+
+div#menu_area ul>li>ul>li>ul>li>span {
+    text-indent: 2em;
+    background-color: #f0fff0;
+}
