@@ -2,6 +2,26 @@
     background-color: #ffffff;
 }
 
+a {
+    text-decoration: none;
+}
+
+:not(#menu_area) a:hover {
+    text-decoration: underline;
+}
+
+:not(#menu_area) a:link {
+    color: #0000ee;
+}
+
+:not(#menu_area) a:visited {
+    color: #81007f;
+}
+
+div#menu_area a {
+    color: #00c0d4;
+}
+
 div:not(#menu_area) {
     overflow-y: auto;
 }
