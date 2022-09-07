@@ -119,6 +119,7 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
     output_text: list[str] = []
     output_directory = re.sub(
         os.path.join(root_path, "_html") + r"\\?", "", cur_dir)
+    back_dir = os.path.relpath("_html/", cur_dir)
     with open(os.path.join(root_path, "_template", template_path), 'r', encoding='utf_8') as f:
         flag_list: list[bool] = []
         text = f.readlines()
@@ -161,11 +162,14 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
                         replace_text = ""
                         for i, style in enumerate(define_data.get_style_list()):
                             if i == 0:
-                                replace_text = replace_text + "<link rel=\"stylesheet\" href=\"style/" + \
-                                    style + "\" type=\"text/css\">"
+                                replace_text = replace_text + "<link rel=\"stylesheet\" href=\"" + \
+                                    os.path.join(back_dir, "style/",
+                                                 style) + "\" type=\"text/css\">"
                             else:
                                 replace_text = '\n' + tabs + replace_text + \
-                                    "<link rel=\"stylesheet\" href=\"style/" + style + "\" type=\"text/css\">"
+                                    "<link rel=\"stylesheet\" href=\"" + \
+                                    os.path.join(back_dir, "style/",
+                                                 style) + "\" type=\"text/css\">"
                         output_line = output_line.replace(
                             syntax, replace_text)
                     case HtmlToken.JUDGE_SYMBOL:
