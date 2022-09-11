@@ -9,7 +9,8 @@ from tkinter import INSERT
 
 root_path = sys.argv[1]
 output_path = sys.argv[2]
-markdown_path = os.walk(root_path + "_html")
+markdown_path = os.walk(os.path.join(root_path, "_html"))
+define_path = os.walk(os.path.join(root_path, "_docs"))
 
 
 class MergerSyntaxError(Exception):
@@ -255,16 +256,32 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
     print("Completed", "->", os.path.join(output_path, output_directory, file_name))
 
 
+def is_exist_in(file_name: str, file_list: list[str]) -> bool:
+    if not os.path.exists(file_name):
+        return False
+    for file in file_list:
+        if os.path.samefile(file, file_name):
+            return True
+    return False
+
+
 default_define_data = parse_define_file(
     os.path.join(root_path, "default.def"), DefineData())
+
+define_file_list: list[str] = []
+for cur_dir, dummy, file_list in define_path:
+    for file_name in file_list:
+        define_file_list.append(os.path.join(os.path.relpath(
+            os.path.join(cur_dir), root_path), file_name))
+
 
 for cur_dir, dummy, file_list in markdown_path:
     for file_name in file_list:
         if ".html" in file_name:
             define_data: DefineData
             define_file = os.path.join(
-                root_path, "_docs", str(re.match("(.+)\.html", file_name)) + ".def")
-            if define_file in file_list:
+                root_path, "_docs", os.path.relpath(cur_dir, os.path.join(root_path, "_html")), re.findall("(.+)\.html", file_name)[0] + ".def")
+            if is_exist_in(define_file, define_file_list):
                 define_data = parse_define_file(define_file, DefineData())
             else:
                 define_data = default_define_data
