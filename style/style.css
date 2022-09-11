@@ -55,7 +55,7 @@ div#menu_area ul>li {
     position: relative;
 }
 
-div#menu_area ul>li#menu>ul {
+div#menu_area ul>li.menu>ul {
     overflow: hidden;
     position: absolute;
     width: 100%;
@@ -64,7 +64,7 @@ div#menu_area ul>li#menu>ul {
     max-width: 0em;
 }
 
-div#menu_area ul>li#menu:hover>ul {
+div#menu_area ul>li.menu:hover>ul {
     overflow: visible;
     max-width: 30em;
     animation: menu_popup 1s ease 0s;
@@ -86,8 +86,8 @@ div#menu_area ul>li>span:before {
     content: "\27A2";
 }
 
-div#menu_area ul>li#menu>a>span:before,
-div#menu_area ul>li#menu>span:before {
+div#menu_area ul>li.menu>a>span:before,
+div#menu_area ul>li.menu>span:before {
     content: "\23FA";
 }
 
@@ -105,8 +105,8 @@ div#menu_area ul>li span {
     white-space: nowrap;
 }
 
-div#menu_area ul>li#menu>a>span,
-div#menu_area ul>li#menu>span {
+div#menu_area ul>li.menu>a>span,
+div#menu_area ul>li.menu>span {
     font-weight: bold;
 }
 
