@@ -253,7 +253,8 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
         os.makedirs(os.path.join(output_path, output_directory), exist_ok=True)
     with open(os.path.join(output_path, output_directory, file_name), 'w', encoding='utf_8') as f:
         f.writelines(output_text)
-    print("Completed", "->", os.path.join(output_path, output_directory, file_name))
+    print("Completed", "->", os.path.join(output_path,
+          output_directory, file_name), end="\n\n")
 
 
 def is_exist_in(file_name: str, file_list: list[str]) -> bool:
@@ -274,16 +275,19 @@ for cur_dir, dummy, file_list in define_path:
         define_file_list.append(os.path.join(os.path.relpath(
             os.path.join(cur_dir), root_path), file_name))
 
+print(default_define_data.get_template_html())
 
 for cur_dir, dummy, file_list in markdown_path:
     for file_name in file_list:
         if ".html" in file_name:
+            print(">", file_name)
             define_data: DefineData
             define_file = os.path.join(
                 root_path, "_docs", os.path.relpath(cur_dir, os.path.join(root_path, "_html")), re.findall("(.+)\.html", file_name)[0] + ".def")
             if is_exist_in(define_file, define_file_list):
+                print("Parsing", define_file+"...")
                 define_data = parse_define_file(define_file, DefineData())
             else:
                 define_data = default_define_data
-            print("Merging", file_name + "...")
+            print("Merging...")
             text = merge_html(cur_dir, file_name, define_data)
