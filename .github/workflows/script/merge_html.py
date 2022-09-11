@@ -33,17 +33,28 @@ class DefineData:
     def __init__(self):
         self.__symbol_list: list[str] = []
         self.__style_list: list[str] = []
+        self.__include_list: list[str] = []
         self.__const_list: dict = {}
-        self.__title: str
-        self.__template_html: str
+        self.__title: str = ""
+        self.__template_html: str = ""
 
     def add_symbol(self, word: str):
+        if word in self.__symbol_list:
+            return
         self.__symbol_list.append(word)
         self.__symbol_list = sorted(self.__symbol_list)
 
     def add_style(self, word: str):
+        if word in self.__style_list:
+            return
         self.__style_list.append(word)
         self.__style_list = sorted(self.__style_list)
+
+    def add_include(self, word: str):
+        if word in self.__include_list:
+            return
+        self.__include_list.append(word)
+        self.__include_list = sorted(self.__include_list)
 
     def add_const_list(self, name: str, value: str):
         self.__const_list[name] = value
@@ -56,6 +67,15 @@ class DefineData:
 
     def symbol_defined(self, word: str) -> bool:
         return word in self.__symbol_list
+
+    def included(self, word: str, dir: str = "") -> bool:
+        if re.search(r"\*", word) is not None:
+            return word in self.__include_list
+        for include in self.__include_list:
+            if os.path.isfile(include):
+                if os.path.samefile(include, os.path.join(dir, word)):
+                    return True
+        return False
 
     def get_style_list(self) -> list[str]:
         return self.__style_list
@@ -71,8 +91,30 @@ class DefineData:
             return self.__const_list[name]
         return ""
 
+    def get_all(self) -> tuple[list[str], list[str], list[str], dict, str, str]:
+        return self.__symbol_list, self.__style_list, self.__include_list, self.__const_list, self.__title, self.__template_html
 
-def analyse_define_token(define_data: DefineData, token_list: list[str]):
+    def add(self, other):
+        all = other.get_all()
+        self.__symbol_list.extend(all[0])
+        self.__style_list.extend(all[1])
+        self.__include_list.extend(all[2])
+        self.__const_list.update(all[3])
+        self.__title = all[4]
+        self.__template_html = all[5]
+        return self
+
+    def __add__(self, other):
+        return self.add(other)
+
+    def __iadd__(self, other):
+        return self.add(other)
+
+
+default_define_data: DefineData
+
+
+def analyse_define_token(define_data: DefineData, token_list: list[str]) -> str:
     match token_list[0]:
         case "def":
             match token_list[1]:
@@ -84,6 +126,34 @@ def analyse_define_token(define_data: DefineData, token_list: list[str]):
             define_data.set_template_html(token_list[1])
         case "style":
             define_data.add_style(token_list[1])
+        case "include":
+            default_symbol = "*DEFAULT"
+            if token_list[1] == default_symbol:
+                if not define_data.included(token_list[1]):
+                    print("including...", token_list[1])
+                    define_data.add_include(token_list[1])
+                    define_data += default_define_data
+            else:
+                return token_list[1]
+
+    return None
+
+
+def parse_define_file(define_file: str, define_data: DefineData) -> DefineData:
+    define_data.add_include(os.path.abspath(define_file))
+    with open(define_file, 'r', encoding='utf_8_sig') as f:
+        text = f.readlines()
+        for line in text:
+            parse_file = analyse_define_token(
+                define_data, re.split('[ \n]', line))
+            # 多重インクルード防止
+            if parse_file is not None \
+                    and not define_data.included(parse_file, os.path.dirname(define_file)):
+                include_file = os.path.join(
+                    os.path.dirname(define_file), parse_file)
+                print("including...", include_file)
+                define_data = parse_define_file(include_file, define_data)
+    return define_data
 
 
 def parse_html_token(token_list: list[str]) -> tuple[HtmlToken, list[str]]:
@@ -102,15 +172,6 @@ def parse_html_token(token_list: list[str]) -> tuple[HtmlToken, list[str]]:
                     return HtmlToken.INSERT_TEMPLATE, token_list[1]
                 case "STYLE":
                     return HtmlToken.INSERT_STYLE, ""
-
-
-def parse_define_file(define_file: str) -> DefineData:
-    define_data = DefineData()
-    with open(define_file, 'r', encoding='utf_8_sig') as file:
-        text = file.readlines()
-        for line in text:
-            analyse_define_token(define_data, re.split('[ \n]', line))
-    return define_data
 
 
 def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[str]:
@@ -166,7 +227,7 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
                                     os.path.join(back_dir, "style/",
                                                  style) + "\" type=\"text/css\">"
                             else:
-                                replace_text = '\n' + tabs + replace_text + \
+                                replace_text = replace_text + '\n' + tabs + \
                                     "<link rel=\"stylesheet\" href=\"" + \
                                     os.path.join(back_dir, "style/",
                                                  style) + "\" type=\"text/css\">"
@@ -194,7 +255,8 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
     print("Completed", "->", os.path.join(output_path, output_directory, file_name))
 
 
-default_define_data = parse_define_file(os.path.join(root_path, "default.def"))
+default_define_data = parse_define_file(
+    os.path.join(root_path, "default.def"), DefineData())
 
 for cur_dir, dummy, file_list in markdown_path:
     for file_name in file_list:
@@ -203,7 +265,7 @@ for cur_dir, dummy, file_list in markdown_path:
             define_file = os.path.join(
                 root_path, "_docs", str(re.match("(.+)\.html", file_name)) + ".def")
             if define_file in file_list:
-                define_data = parse_define_file(define_file)
+                define_data = parse_define_file(define_file, DefineData())
             else:
                 define_data = default_define_data
             print("Merging", file_name + "...")
