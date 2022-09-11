@@ -182,6 +182,7 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
     output_directory = re.sub(
         os.path.join(root_path, "_html") + r"\\?", "", cur_dir)
     back_dir = os.path.relpath("_html/", cur_dir)
+    dir_from_html = os.path.relpath(cur_dir, "_html")
     with open(os.path.join(root_path, "_template", template_path), 'r', encoding='utf_8') as f:
         flag_list: list[bool] = []
         text = f.readlines()
@@ -249,10 +250,21 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
             if not False in flag_list:
                 if bool(re.search(("[^ \t\n^]+"), output_line)) == True:
                     output_text.append(output_line)
+    output = "".join(output_text)
+    link_list = re.finditer(
+        r"(?<=\<a href\=\")(.+?)(?=\"\>)", output, re.MULTILINE)
+    for link in link_list:
+        link_str = link.group()
+        if link_str[0] == '#':
+            continue
+        if os.path.relpath(link_str, dir_from_html) == os.path.normpath(link_str):
+            continue
+        output = output.replace("href=\""+link_str+"\"",
+                                "href=\""+os.path.relpath(link_str, dir_from_html)+"\"")
     if output_directory != "":
         os.makedirs(os.path.join(output_path, output_directory), exist_ok=True)
     with open(os.path.join(output_path, output_directory, file_name), 'w', encoding='utf_8') as f:
-        f.writelines(output_text)
+        f.write(output)
     print("Completed", "->", os.path.join(output_path,
           output_directory, file_name), end="\n\n")
 
