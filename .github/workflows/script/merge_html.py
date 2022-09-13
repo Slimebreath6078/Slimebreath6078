@@ -280,7 +280,8 @@ print(default_define_data.get_template_html())
 for cur_dir, dummy, file_list in markdown_path:
     for file_name in file_list:
         if ".html" in file_name:
-            print(">", file_name)
+            print(">", os.path.normpath(os.path.join(
+                os.path.relpath(cur_dir, "_html"), file_name)))
             define_data: DefineData
             define_file = os.path.join(
                 root_path, "_docs", os.path.relpath(cur_dir, os.path.join(root_path, "_html")), re.findall("(.+)\.html", file_name)[0] + ".def")
