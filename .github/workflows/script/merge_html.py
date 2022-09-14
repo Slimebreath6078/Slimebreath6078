@@ -157,7 +157,7 @@ def parse_define_file(define_file: str, define_data: DefineData) -> DefineData:
     return define_data
 
 
-def parse_html_token(token_list: list[str]) -> tuple[HtmlToken, list[str]]:
+def analyse_html_token(token_list: list[str]) -> tuple[HtmlToken, list[str]]:
     match token_list[0][0]:
         case '$':
             return HtmlToken.REPLACE_CONST, token_list[0][1:]
@@ -175,15 +175,12 @@ def parse_html_token(token_list: list[str]) -> tuple[HtmlToken, list[str]]:
                     return HtmlToken.INSERT_STYLE, ""
 
 
-def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[str]:
+def parse_html_token(cur_dir: str, file_name: str, template_path: str, define_data: DefineData) -> str:
     file_path = os.path.join(cur_dir, file_name)
-    template_path = define_data.get_template_html()
     output_text: list[str] = []
-    output_directory = re.sub(
-        os.path.join(root_path, "_html") + r"\\?", "", cur_dir)
     back_dir = os.path.relpath("_html/", cur_dir)
     dir_from_html = os.path.relpath(cur_dir, "_html")
-    with open(os.path.join(root_path, "_template", template_path), 'r', encoding='utf_8') as f:
+    with open(os.path.join(root_path, "_template", template_path), 'r', encoding='utf_8_sig') as f:
         flag_list: list[bool] = []
         text = f.readlines()
         for line in text:
@@ -194,7 +191,7 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
                 continue
             for syntax in find:
                 token_list = syntax[1:-1].split(' ')
-                token_result = parse_html_token(token_list)
+                token_result = analyse_html_token(token_list)
                 if False in flag_list and token_result[0] != HtmlToken.ENDIF:
                     line.replace(syntax, "")
                     continue
@@ -211,16 +208,11 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
                             output_line = output_line.replace(
                                 syntax, replace_text)
                     case HtmlToken.INSERT_TEMPLATE:
-                        with open(os.path.join(root_path, "_template", token_result[1]), 'r') as find_template:
-                            replace_text_base = find_template.readlines()
-                            replace_text: str()
-                            for i, replace_line in enumerate(replace_text_base):
-                                if i == 0:
-                                    replace_text = replace_text + replace_line
-                                else:
-                                    replace_text = replace_text + tabs + replace_line
-                            output_line = output_line.replace(
-                                syntax, '\n'.join(replace_text))
+                        template_text = parse_html_token(
+                            cur_dir, file_name, token_result[1], define_data)
+                        template_text = template_text.replace("\n", "\n"+tabs)
+                        output_line = output_line.replace(
+                            syntax, template_text)
                     case HtmlToken.INSERT_STYLE:
                         replace_text = ""
                         for i, style in enumerate(define_data.get_style_list()):
@@ -261,6 +253,15 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
             continue
         output = output.replace("href=\""+link_str+"\"",
                                 "href=\""+os.path.relpath(link_str, dir_from_html)+"\"")
+    return output
+
+
+def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[str]:
+    output = parse_html_token(
+        cur_dir, file_name, define_data.get_template_html(), define_data)
+
+    output_directory = re.sub(
+        os.path.join(root_path, "_html") + r"\\?", "", cur_dir)
     if output_directory != "":
         os.makedirs(os.path.join(output_path, output_directory), exist_ok=True)
     with open(os.path.join(output_path, output_directory, file_name), 'w', encoding='utf_8') as f:
