@@ -260,8 +260,7 @@ def merge_html(cur_dir: str, file_name: str, define_data: DefineData) -> list[st
     output = parse_html_token(
         cur_dir, file_name, define_data.get_template_html(), define_data)
 
-    output_directory = re.sub(
-        os.path.join(root_path, "_html") + r"\\?", "", cur_dir)
+    output_directory = os.path.relpath(cur_dir, "_html")
     if output_directory != "":
         os.makedirs(os.path.join(output_path, output_directory), exist_ok=True)
     with open(os.path.join(output_path, output_directory, file_name), 'w', encoding='utf_8') as f:

@@ -6,6 +6,11 @@ a {
     text-decoration: none;
 }
 
+div#mokuji {
+    background-color: #d3d3d3;
+    width: max-content;
+}
+
 :not(#menu_area) a:hover {
     text-decoration: underline;
 }

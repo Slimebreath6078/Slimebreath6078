@@ -1,0 +1,2 @@
+﻿include *DEFAULT
+include azurlane.def
