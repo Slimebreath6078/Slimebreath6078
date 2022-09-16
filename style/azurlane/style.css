@@ -1,0 +1,23 @@
+﻿.fleet table {
+    color: #000000;
+}
+
+.fleet table,
+.fleet td,
+.fleet th {
+    border: solid;
+    border-collapse: collapse;
+    padding: 10px 5px;
+}
+
+.fleet tbody>tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.fleet tbody>tr:nth-child(even) {
+    background-color: #e0ffff;
+}
+
+.fleet tbody>tr:nth-child(even)>td:not(:first-child) {
+    font-size: smaller;
+}
