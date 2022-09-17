@@ -3,7 +3,6 @@
 on:
   push:
     branches: [ master ]
-  workflow_dispatch:
 
 env:
   BASE_BRANCH_NAME: master
@@ -15,6 +14,9 @@ jobs:
   Build-and-deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Not running except master
+        if: github.ref != 'refs/heads/master'
+        run: exit 1
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
