@@ -23,7 +23,7 @@ div#mokuji {
     color: #81007f;
 }
 
-div#menu_area a>span {
+section#menu_area a>span {
     color: #00c0d4;
 }
 
@@ -31,24 +31,24 @@ div:not(#menu_area) {
     overflow-y: auto;
 }
 
-div#menu_block {
+header {
     overflow: visible;
     float: left;
     width: 20%;
     height: 100%;
 }
 
-div#body_block {
+article {
     float: right;
     width: 80%;
     height: 100%;
 }
 
-div#menu_area {
+section#menu_area {
     width: 70%;
 }
 
-div#menu_area ul {
+section#menu_area ul {
     width: auto;
     margin: 0px;
     padding: 0px;
@@ -56,11 +56,11 @@ div#menu_area ul {
     overflow: visible;
 }
 
-div#menu_area ul>li {
+section#menu_area ul>li {
     position: relative;
 }
 
-div#menu_area ul>li.menu>ul {
+section#menu_area ul>li.menu>ul {
     overflow: hidden;
     position: absolute;
     width: 100%;
@@ -69,7 +69,7 @@ div#menu_area ul>li.menu>ul {
     max-width: 0em;
 }
 
-div#menu_area ul>li.menu:hover>ul {
+section#menu_area ul>li.menu:hover>ul {
     overflow: visible;
     max-width: 30em;
     animation: menu_popup 1s ease 0s;
@@ -86,48 +86,48 @@ div#menu_area ul>li.menu:hover>ul {
     }
 }
 
-div#menu_area ul>li>a>span:before,
-div#menu_area ul>li>span:before {
+section#menu_area ul>li>a>span:before,
+section#menu_area ul>li>span:before {
     content: "\27A2";
 }
 
-div#menu_area ul>li.menu>a>span:before,
-div#menu_area ul>li.menu>span:before {
+section#menu_area ul>li.menu>a>span:before,
+section#menu_area ul>li.menu>span:before {
     content: "\23FA";
 }
 
-div#menu_area ul>li>a>span,
-div#menu_area ul>li>span {
+section#menu_area ul>li>a>span,
+section#menu_area ul>li>span {
     display: inline-block;
     width: 100%;
     background-clip: padding-box;
     padding: 1em 0;
 }
 
-div#menu_area ul>li span {
+section#menu_area ul>li span {
     font-size: medium;
     font-weight: normal;
     white-space: nowrap;
 }
 
-div#menu_area ul>li.menu>a>span,
-div#menu_area ul>li.menu>span {
+section#menu_area ul>li.menu>a>span,
+section#menu_area ul>li.menu>span {
     font-weight: bold;
 }
 
-div#menu_area ul>li>a>span,
-div#menu_area ul>li>span {
+section#menu_area ul>li>a>span,
+section#menu_area ul>li>span {
     background-color: #8080ff;
 }
 
-div#menu_area ul>li>ul>li>a>span,
-div#menu_area ul>li>ul>li>span {
+section#menu_area ul>li>ul>li>a>span,
+section#menu_area ul>li>ul>li>span {
     text-indent: 1em;
     background-color: #c0ffff;
 }
 
-div#menu_area ul>li>ul>li>ul>li>a>span,
-div#menu_area ul>li>ul>li>ul>li>span {
+section#menu_area ul>li>ul>li>ul>li>a>span,
+section#menu_area ul>li>ul>li>ul>li>span {
     text-indent: 2em;
     background-color: #f0fff0;
 }
