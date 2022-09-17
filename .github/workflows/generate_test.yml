@@ -1,0 +1,35 @@
+﻿name: generate_test
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
+
+env:
+  SCRIPT_DIR: .github/workflows/script
+
+jobs:
+  Generate-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: action/checkout@v3
+      - uses: action/setup-python@v4
+        with:
+          python-version: "3.10.6"
+      - name: set_up
+        run: |
+          - mkdir _html
+          - mkdir site
+          - python3 -m pip install --upgrade pip
+          - pip install markdown
+      - name: generate
+        run: |
+          - python3 $SCRIPT_DIR/generate_html.py ./
+          - python3 $SCRIPT_DIR/merge_html.py ./ site
+      - name: remove_dir
+        run: |
+          - rm -rf site
+          - rm -rf _html
