@@ -316,8 +316,6 @@ for cur_dir, dummy, file_list in define_path:
         define_file_list.append(os.path.join(os.path.relpath(
             os.path.join(cur_dir), root_path), file_name))
 
-print(default_define_data.get_template_html())
-
 for cur_dir, dummy, file_list in markdown_path:
     for file_name in file_list:
         if ".html" in file_name:
