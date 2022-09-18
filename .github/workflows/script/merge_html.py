@@ -1,10 +1,7 @@
-﻿from encodings import utf_8_sig
-import os
-from secrets import token_bytes
+﻿import os
 import sys
 import re
 import enum
-from tkinter import INSERT
 
 
 root_path = sys.argv[1]
@@ -22,12 +19,24 @@ class MergerSyntaxError(Exception):
 
 
 class HtmlToken(enum.Enum):
-    INSERT_MARKDOWN = 0
-    ENDIF = 1
-    JUDGE_SYMBOL = 2
-    REPLACE_CONST = 3
-    INSERT_TEMPLATE = 4
-    INSERT_STYLE = 5
+    NONE = 0
+    INSERT_MARKDOWN = 1
+    ENDIF = 2
+    JUDGE_SYMBOL = 3
+    REPLACE_CONST = 4
+    INSERT_TEMPLATE = 5
+    INSERT_STYLE = 6
+
+
+class SpecialToken(enum.Enum):
+    BRACKET = 0
+    CURLY_BRACKET = 1
+    DOLLAR = 2
+
+    def __str__(self):
+        match self:
+            case self.DOLLAR:
+                return "$"
 
 
 class DefineData:
@@ -157,22 +166,43 @@ def parse_define_file(define_file: str, define_data: DefineData) -> DefineData:
     return define_data
 
 
-def analyse_html_token(token_list: list[str]) -> tuple[HtmlToken, list[str]]:
-    match token_list[0][0]:
-        case '$':
-            return HtmlToken.REPLACE_CONST, token_list[0][1:]
-        case _:
-            match token_list[0]:
-                case "MARKDOWN":
-                    return HtmlToken.INSERT_MARKDOWN, ""
-                case "ENDIF":
-                    return HtmlToken.ENDIF, ""
-                case "SYMBOL":
-                    return HtmlToken.JUDGE_SYMBOL, token_list[1]
-                case "TEMPLATE":
-                    return HtmlToken.INSERT_TEMPLATE, token_list[1]
-                case "STYLE":
-                    return HtmlToken.INSERT_STYLE, ""
+# parent_token, define_list(token, (return_num, token_enum))
+SYNTAX_LIST: dict[tuple, dict[str | SpecialToken, tuple[int, HtmlToken]]] = \
+    {(): {"MARKDOWN": (0, HtmlToken.INSERT_MARKDOWN),
+          "ENDIF": (0, HtmlToken.ENDIF),
+          "SYMBOL": (1, HtmlToken.JUDGE_SYMBOL),
+          "TEMPLATE": (1, HtmlToken.INSERT_TEMPLATE),
+          "STYLE": (0, HtmlToken.INSERT_STYLE),
+     SpecialToken.DOLLAR: (1, HtmlToken.REPLACE_CONST)}}
+
+
+def convert_special_token(token_list: list[str]) -> list[str | SpecialToken]:
+    return [SpecialToken.DOLLAR if i == '$' else i for i in token_list]
+
+
+def analyse_html_token(token: str) -> tuple[HtmlToken, list[str]]:
+    token_str_list: list[str] = re.split("([\$ ])", token[1:-1])
+    token_str_list = [i for i in token_str_list if i != ' ' and i != '']
+    token_list = convert_special_token(token_str_list)
+    key: list[str | SpecialToken] = []
+    count = 0
+    while True:
+        KEY_TUPLE = tuple(key)
+        KEY_STR = [str(i) for i in key]
+        if KEY_TUPLE not in SYNTAX_LIST:
+            raise MergerSyntaxError(
+                "The token \"" + " ".join(KEY_STR) + "\" is not found in syntax list tree.")
+        if token_list[count] not in SYNTAX_LIST[KEY_TUPLE]:
+            raise MergerSyntaxError(
+                "The token \"" + str(token_list[count]) + "\" is not found in \"" + " ".join(KEY_STR)+"\".")
+        if SYNTAX_LIST[KEY_TUPLE][token_list[count]][1] != HtmlToken.NONE:
+            SYNTAX_TUPLE = SYNTAX_LIST[KEY_TUPLE][token_list[count]]
+            if SYNTAX_LIST[KEY_TUPLE][token_list[count]][0] <= 0:
+                return SYNTAX_TUPLE[1], [""]
+            RETURN_START = count + 1
+            return SYNTAX_TUPLE[1], token_list[RETURN_START:RETURN_START+SYNTAX_TUPLE[0]].copy()
+        key.append(token_list[count])
+        count += 1
 
 
 def parse_html_token(cur_dir: str, file_name: str, template_path: str, define_data: DefineData) -> str:
@@ -190,8 +220,7 @@ def parse_html_token(cur_dir: str, file_name: str, template_path: str, define_da
             if find.count == 0:
                 continue
             for syntax in find:
-                token_list = syntax[1:-1].split(' ')
-                token_result = analyse_html_token(token_list)
+                token_result = analyse_html_token(syntax)
                 if False in flag_list and token_result[0] != HtmlToken.ENDIF:
                     line.replace(syntax, "")
                     continue
@@ -209,7 +238,7 @@ def parse_html_token(cur_dir: str, file_name: str, template_path: str, define_da
                                 syntax, replace_text)
                     case HtmlToken.INSERT_TEMPLATE:
                         template_text = parse_html_token(
-                            cur_dir, file_name, token_result[1], define_data)
+                            cur_dir, file_name, token_result[1][0], define_data)
                         template_text = template_text.replace("\n", "\n"+tabs)
                         output_line = output_line.replace(
                             syntax, template_text)
@@ -229,11 +258,11 @@ def parse_html_token(cur_dir: str, file_name: str, template_path: str, define_da
                             syntax, replace_text)
                     case HtmlToken.JUDGE_SYMBOL:
                         flag_list.append(
-                            define_data.symbol_defined(token_result[1]))
+                            define_data.symbol_defined(token_result[1][0]))
                         output_line = output_line.replace(syntax, '')
                     case HtmlToken.REPLACE_CONST:
                         output_line = output_line.replace(
-                            syntax, define_data.get_const(token_result[1]))
+                            syntax, define_data.get_const(token_result[1][0]))
                     case HtmlToken.ENDIF:
                         del (flag_list[-1])
                         output_line = output_line.replace(syntax, '')
