@@ -27,7 +27,8 @@ section#menu_area a>span {
     color: #00c0d4;
 }
 
-div:not(#menu_area) {
+header,
+article {
     overflow-y: auto;
 }
 
