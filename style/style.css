@@ -33,7 +33,8 @@ article {
 }
 
 header {
-    overflow: visible;
+    position: fixed;
+    overflow-x: visible;
     float: left;
     width: 20%;
     height: 100%;
