@@ -34,7 +34,7 @@ article {
 
 header {
     position: fixed;
-    overflow-x: visible;
+    overflow: visible;
     float: left;
     width: 20%;
     height: 100%;
